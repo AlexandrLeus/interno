@@ -1,0 +1,275 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using InternoApi.Models;
+using InternoApi.Data;
+using InternoApi.DTOs;
+
+namespace InternoApi.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class BlogController : ControllerBase
+    {
+        private readonly ApplicationDbContext _context;
+
+        public BlogController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<BlogPostDto>>> GetBlogPosts(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 6,
+            [FromQuery] int? tag = null,
+            [FromQuery] int? category = null)
+
+        {
+
+            var query = _context.BlogPosts
+            .Include(p => p.Tags)
+            .Include(p => p.Categories)
+            .AsQueryable();
+
+            if (tag.HasValue)
+            {
+                query = query.Where(p => p.Tags.Any(t => t.Id == tag.Value));
+            }
+
+            if (category.HasValue)
+            {
+                query = query.Where(p => p.Categories.Any(c => c.Id == category.Value));
+            }
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            var posts = await query
+                .OrderByDescending(p => p.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new BlogPostDto
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    Description = p.Description,
+                    ImageUrl = p.ImageUrl,
+                    CreatedAt = p.CreatedAt,
+                    TagIds = p.Tags.Select(t => t.Id).ToList(),
+                    CategoryIds = p.Categories.Select(c => c.Id).ToList()
+                })
+                .ToListAsync();
+
+            var result = new
+            {
+                TotalItems = totalCount,
+                TotalPages = totalPages,
+                Page = page,
+                PageSize = pageSize,
+                Items = posts
+            };
+
+            return Ok(result);
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<SearchBlogPostDto>> SearchPosts(
+            [FromQuery] string q,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 5)
+        {
+            if (string.IsNullOrWhiteSpace(q) || q.Length < 2)
+            {
+                return BadRequest("Search query must be at least 2 characters");
+            }
+
+            var query = _context.BlogPosts
+                .Where(p =>
+                    p.Title.Contains(q) ||
+                    p.Description.Contains(q) ||
+                    p.Content.Contains(q) ||
+                    p.Tags.Any(t => t.Name.Contains(q)));
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            var posts = await query
+                .OrderByDescending(p => p.Title.Contains(q) ? 2 : 0)
+                .ThenByDescending(p => p.Description.Contains(q) ? 1 : 0)
+                .ThenByDescending(p => p.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new SearchBlogPostDto
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    Description = p.Description,
+                })
+                .ToListAsync();
+
+            var result = new
+            {
+                TotalItems = totalCount,
+                TotalPages = totalPages,
+                Page = page,
+                PageSize = pageSize,
+                Items = posts
+            };
+
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<BlogPostDetailDto>> GetBlogPost(int id)
+        {
+            var blogPost = await _context.BlogPosts
+            .Where(p => p.Id == id)
+            .Select(p => new BlogPostDetailDto
+            {
+                Id = p.Id,
+                Title = p.Title,
+                Description = p.Description,
+                Content = p.Content,
+                ImageUrl = p.ImageUrl,
+                CreatedAt = p.CreatedAt,
+                UpdatedAt = p.UpdatedAt,
+                Tags = p.Tags.Select(t => new TagDto
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    IsActive = t.IsActive
+                }).ToList(),
+                Categories = p.Categories.Select(c => new CategoryDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    IsActive = c.IsActive
+                }).ToList()
+            }).FirstOrDefaultAsync();
+
+            if (blogPost == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(blogPost);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<BlogPostDto>> CreateBlogPost(CreateBlogPostDto createDto)
+        {
+
+            var blogPost = new BlogPost
+            {
+                Title = createDto.Title,
+                Description = createDto.Description,
+                Content = createDto.Content,
+                ImageUrl = createDto.ImageUrl,
+                CreatedAt = DateTime.UtcNow,
+            };
+
+            if (createDto.TagIds?.Any() == true)
+            {
+                if (createDto.TagIds.Contains(0))
+                {
+                    return BadRequest("Tag ID cannot be 0");
+                }
+
+                var tagsToAdd = await _context.Tags
+                    .Where(t => createDto.TagIds.Contains(t.Id) && t.IsActive)
+                    .ToListAsync();
+
+                blogPost.Tags = tagsToAdd;
+            }
+
+            if (createDto.CategoryIds?.Any() == true)
+            {
+                if (createDto.CategoryIds.Contains(0))
+                {
+                    return BadRequest("Category ID cannot be 0");
+                }
+
+                var CategoryToAdd = await _context.Categories
+                    .Where(t => createDto.CategoryIds.Contains(t.Id) && t.IsActive)
+                    .ToListAsync();
+
+                blogPost.Categories = CategoryToAdd;
+            }
+
+            _context.BlogPosts.Add(blogPost);
+            await _context.SaveChangesAsync();
+
+            var result = new BlogPostDto
+            {
+                Id = blogPost.Id,
+                Title = blogPost.Title,
+                Description = blogPost.Description,
+                ImageUrl = blogPost.ImageUrl,
+                CreatedAt = blogPost.CreatedAt,
+                TagIds = blogPost.Tags.Select(t => t.Id).ToList(),
+                CategoryIds = blogPost.Categories.Select(c => c.Id).ToList()
+            };
+
+            return CreatedAtAction(nameof(GetBlogPost), new { id = blogPost.Id }, result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateBlogPost(int id, UpdateBlogPostDto updateDto)
+        {
+            var blogPost = await _context.BlogPosts.FindAsync(id);
+
+            if (blogPost == null)
+            {
+                return NotFound();
+            }
+
+            if (updateDto.Title != null)
+                blogPost.Title = updateDto.Title;
+
+            if (updateDto.Description != null)
+                blogPost.Description = updateDto.Description;
+
+            if (updateDto.Content != null)
+                blogPost.Content = updateDto.Content;
+
+            if (updateDto.ImageUrl != null)
+                blogPost.ImageUrl = updateDto.ImageUrl;
+
+            blogPost.UpdatedAt = DateTime.UtcNow;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.BlogPosts.Any(e => e.Id == id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteBlogPost(int id)
+        {
+            var blogPost = await _context.BlogPosts.FindAsync(id);
+            if (blogPost == null)
+            {
+                return NotFound();
+            }
+
+            _context.BlogPosts.Remove(blogPost);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+    }
+}

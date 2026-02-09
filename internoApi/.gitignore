@@ -1,0 +1,15 @@
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.ilk
+*.pdb
+*.db
+.vs/
+**/appsettings.Development.json
+**/appsettings.Local.json
+*.swp
+*.swo
+.DS_Store
+.env

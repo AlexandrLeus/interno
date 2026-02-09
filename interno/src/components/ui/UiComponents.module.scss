@@ -1,0 +1,99 @@
+.blogContainer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.blogList {
+    width: 340px;
+    height: 521px;
+    border: 1px solid #E7E7E7;
+    border-radius: 62px;
+    padding: 21px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+
+    &:hover {
+        background-color: #F4F0EC;
+
+        circle {
+            fill: white;
+        }
+    }
+
+    >img {
+        width: 340px;
+        height: 290px;
+        border-top-left-radius: 45px;
+        border-top-right-radius: 45px;
+    }
+
+    >h2 {
+        font-weight: 400;
+        font-family: "DM Serif Display", serif;
+        color: #292F36;
+        font-size: 25px;
+        width: 305px;
+    }
+
+    >div {
+        color: #4D5053;
+        font-size: 16px;
+        font-weight: 400;
+        font-family: "Jost", sans-serif;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+        margin-bottom: 20px;
+    }
+}
+
+.LatestBlogPost {
+    display: flex;
+    gap: 65px;
+    justify-content: space-around;
+    border: 1px solid #E7E7E7;
+    border-radius: 62px;
+    padding: 21px;
+    cursor: pointer;
+
+    >img {
+        width: 569px;
+        height: 478px;
+        border-radius: 50px;
+    }
+
+    >div {
+        width: 469px;
+        display: flex;
+        flex-direction: column;
+
+        >h2 {
+            font-size: 25px;
+            font-weight: 400;
+            font-family: "DM Serif Display", serif;
+            color: #292F36;
+        }
+
+        >p {
+            font-family: "Jost", sans-serif;
+            color: #4D5053;
+            font-size: 22px;
+            font-weight: 400;
+        }
+
+        >div {
+            color: #4D5053;
+            font-size: 16px;
+            font-weight: 400;
+            font-family: "Jost", sans-serif;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            margin-bottom: 20px;
+        }
+    }
+}

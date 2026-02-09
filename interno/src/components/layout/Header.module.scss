@@ -1,0 +1,43 @@
+header {
+    position: fixed;
+    width: 100%;
+    background-color: white;
+    z-index: 100;
+}
+
+.container {
+    height: 60px;
+    width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.interno {
+    font-size: 40px;
+    line-height: 125%;
+    font-weight: 400;
+    font-family: "DM Serif Display", serif;
+    color: #292F36;
+
+}
+
+.logo {
+    display: flex;
+    gap: 10px;
+}
+
+.navLink {
+    display: flex;
+    gap: 30px;
+
+    a {
+        color: #292F36;
+        text-decoration: none;
+        font-size: 20px;
+        line-height: 125%;
+        font-weight: 400;
+        font-family: "Jost", sans-serif;
+    }
+}
