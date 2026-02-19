@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using InternoApi.Models;
 using InternoApi.Data;
 using InternoApi.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InternoApi.Controllers
 {
@@ -156,6 +157,7 @@ namespace InternoApi.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<BlogPostDto>> CreateBlogPost(CreateBlogPostDto createDto)
         {
 
@@ -214,6 +216,7 @@ namespace InternoApi.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateBlogPost(int id, UpdateBlogPostDto updateDto)
         {
             var blogPost = await _context.BlogPosts.FindAsync(id);
@@ -257,6 +260,7 @@ namespace InternoApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteBlogPost(int id)
         {
             var blogPost = await _context.BlogPosts.FindAsync(id);

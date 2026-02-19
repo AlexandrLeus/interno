@@ -13,6 +13,7 @@ namespace InternoApi.Data
         public DbSet<BlogPost> BlogPosts { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,7 +26,8 @@ namespace InternoApi.Data
                 entity.HasKey(e => e.Id);
                 
                 entity.Property(e => e.Id)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("id");
                 
                 entity.Property(e => e.Title)
                     .IsRequired()
@@ -33,14 +35,17 @@ namespace InternoApi.Data
                     .HasColumnName("title");
                 
                 entity.Property(e => e.Description)
+                    .IsRequired()
                     .HasMaxLength(500)
                     .HasColumnName("description");
                 
                 entity.Property(e => e.Content)
+                    .IsRequired()
                     .HasMaxLength(10000)
                     .HasColumnName("content");
                 
                 entity.Property(e => e.ImageUrl)
+                    .IsRequired()
                     .HasColumnName("image_url");
                 
                 entity.Property(e => e.CreatedAt)
@@ -136,6 +141,53 @@ namespace InternoApi.Data
                 entity.HasIndex(e => e.Name)
                     .IsUnique()
                     .HasDatabaseName("idx_category_name_unique");
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("users");
+                
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("id");
+
+                entity.HasIndex(e => e.Email)
+                    .IsUnique();
+
+                entity.Property(e => e.Username)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnName("user_name");
+
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnName("email");
+
+                entity.Property(e => e.PasswordHash)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("password_hash");
+
+                entity.Property(e => e.Role)
+                    .HasConversion<int>() 
+                    .HasDefaultValue(UserRole.User)
+                    .HasColumnName("role");
+
+                entity.Property(e => e.IsActive)
+                    .HasDefaultValue(true)
+                    .HasColumnName("is_active");
+                    
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("NOW()");
+
+                entity.Property(e => e.UpdatedAt)
+                    .HasColumnName("updated_at")
+                    .IsRequired(false);
+                    
             });
         }
     }

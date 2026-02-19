@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using InternoApi.Models;
 using InternoApi.Data;
 using InternoApi.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InternoApi.Controllers
 {
@@ -57,6 +58,7 @@ namespace InternoApi.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<TagDto>> CreateTag(CreateTagDto createDto)
         {
             var existingTag = await _context.Tags.FirstOrDefaultAsync(t => t.Name.ToLower() == createDto.Name.ToLower());
@@ -88,6 +90,7 @@ namespace InternoApi.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdatetTag(int id, UpdateTagDto updateDto)
         {
             var tag = await _context.Tags.FindAsync(id);
@@ -133,6 +136,7 @@ namespace InternoApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteTag(int id)
         {
             var tag = await _context.Tags.FindAsync(id);

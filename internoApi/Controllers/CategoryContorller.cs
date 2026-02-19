@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using InternoApi.Models;
 using InternoApi.Data;
 using InternoApi.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InternoApi.Controllers
 {
@@ -57,6 +58,7 @@ namespace InternoApi.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<CategoryDto>> CreateCategory(CreateCategoryDto createDto)
         {
             var existingCategory = await _context.Categories.FirstOrDefaultAsync(t => t.Name.ToLower() == createDto.Name.ToLower());
@@ -88,6 +90,7 @@ namespace InternoApi.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdatetCategory(int id, UpdateCategoryDto updateDto)
         {
             var category = await _context.Categories.FindAsync(id);
@@ -133,6 +136,7 @@ namespace InternoApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var category = await _context.Categories.FindAsync(id);
