@@ -46,3 +46,22 @@ export interface SearchBlogPost {
   title: string;
   description: string;
 }
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+}
+
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  expiresAt: string;
+  user: User;
+}

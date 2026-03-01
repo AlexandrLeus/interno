@@ -1,5 +1,5 @@
 import type { Tag } from '../types/index';
-import { apiClient } from './config';
+import apiClient  from './config';
 
 export const tagApi = {
     async getTags(): Promise<Tag[]> {

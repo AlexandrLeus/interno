@@ -13,8 +13,10 @@ namespace InternoApi.Services;
 public interface IAuthService
 {
     string GenerateJwtToken(User user);
-    Task<User?> Authenticate(string username, string password);
-    Task<User> Register(RegisterDto registerDto);
+    string GenerateRefreshToken();
+    Task<(AuthResponseDto, string RefreshToken)> Authenticate(LoginDto loginDto);
+    Task<(AuthResponseDto AuthDto, string RefreshToken)> Register(RegisterDto registerDto);
+    Task<(string accessToken, string refreshToken)> RefreshToken(string refreshToken);
     string HashPassword(string password);
     bool VerifyPassword(string password, string passwordHash);
 }
@@ -34,8 +36,8 @@ public class AuthService : IAuthService
     {
         var jwtSettings = _configuration.GetSection("Jwt");
         var key = Encoding.UTF8.GetBytes(
-            jwtSettings["Secret"] 
-            ?? Environment.GetEnvironmentVariable("JWT_SECRET") 
+            jwtSettings["Secret"]
+            ?? Environment.GetEnvironmentVariable("JWT_SECRET")
             ?? throw new InvalidOperationException("JWT Secret not configured")
         );
 
@@ -52,11 +54,11 @@ public class AuthService : IAuthService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddDays(1),
+            Expires = DateTime.UtcNow.AddMinutes(1),
             Issuer = jwtSettings["Issuer"] ?? Environment.GetEnvironmentVariable("JWT_ISSUER"),
             Audience = jwtSettings["Audience"] ?? Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
             SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(key), 
+                new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature
             )
         };
@@ -65,19 +67,64 @@ public class AuthService : IAuthService
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
-
-    public async Task<User?> Authenticate(string email, string password)
+    public string GenerateRefreshToken()
     {
-        var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Email == email && u.IsActive);
-
-        if (user == null || !VerifyPassword(password, user.PasswordHash))
-            return null;
-
-        return user;
+        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
     }
 
-    public async Task<User> Register(RegisterDto registerDto)
+    public async Task<(AuthResponseDto, string RefreshToken)> Authenticate(LoginDto loginDto)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == loginDto.Email && u.IsActive);
+
+        if (user == null || !VerifyPassword(loginDto.Password, user.PasswordHash))
+            throw new UnauthorizedAccessException("Invalid username or password");
+
+        var accessToken = GenerateJwtToken(user);
+        var refreshToken = GenerateRefreshToken();
+
+        user.RefreshToken = refreshToken;
+        user.RefreshTokenExpiryTime = loginDto.RememberMe
+            ? DateTime.UtcNow.AddDays(30)
+            : DateTime.UtcNow.AddDays(1);
+
+        await _context.SaveChangesAsync();
+
+        var authDto = new AuthResponseDto
+        {
+            Token = accessToken,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            User = new UserDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                Role = user.Role.ToString()
+            }
+        };
+
+        return (authDto, refreshToken);
+    }
+    public async Task<(string accessToken, string refreshToken)> RefreshToken(string refreshToken)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken
+                && u.RefreshTokenExpiryTime > DateTime.UtcNow
+                && u.IsActive);
+
+        if (user == null)
+            throw new UnauthorizedAccessException("Invalid or expired refresh token");
+
+        var newAccessToken = GenerateJwtToken(user);
+        var newRefreshToken = GenerateRefreshToken();
+
+        user.RefreshToken = newRefreshToken;
+        await _context.SaveChangesAsync();
+
+        return (newAccessToken, newRefreshToken);
+    }
+
+    public async Task<(AuthResponseDto AuthDto, string RefreshToken)> Register(RegisterDto registerDto)
     {
         if (await _context.Users.Where(u => u.Email == registerDto.Email).AnyAsync())
             throw new ArgumentException("Email already exists");
@@ -92,10 +139,30 @@ public class AuthService : IAuthService
             CreatedAt = DateTime.UtcNow
         };
 
-        _context.Users.Add(user);
+        var accessToken = GenerateJwtToken(user);
+        var refreshToken = GenerateRefreshToken();
+
+        user.RefreshToken = refreshToken;
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(1);
+
+        await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
 
-        return user;
+        var authDto = new AuthResponseDto
+        {
+            Token = accessToken,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            User = new UserDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                Role = user.Role.ToString()
+            }
+        };
+
+        return (authDto, refreshToken);
+
     }
 
     public string HashPassword(string password)

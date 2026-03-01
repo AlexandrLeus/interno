@@ -1,5 +1,5 @@
 import type {BlogPost, PaginatedResponse, BlogPosts, SearchBlogPost} from '../types/index';
-import { apiClient } from './config';
+import apiClient from './config';
 
 export const blogApi = {
   async getAll(page: number, pageSize: number, tag?: number[], category?: number[]): Promise<PaginatedResponse<BlogPosts>> {
