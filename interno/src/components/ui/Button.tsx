@@ -9,7 +9,7 @@ interface ButtonProps {
 
 const Arrow = ({ color }: { color: string }) => (
   <svg width="18" height="16" viewBox="0 0 18 16" fill="none">
-    <path d="M1.00977 7.93826L14.7329 7.80141M9.62794 1.41422L16.1509 7.9372L9.49654 14.5916" stroke={color} stroke-width="2" stroke-linecap="square" stroke-linejoin="round" />
+    <path d="M1.00977 7.93826L14.7329 7.80141M9.62794 1.41422L16.1509 7.9372L9.49654 14.5916" stroke={color} strokeWidth="2" strokeLinecap="square" strokeLinejoin="round" />
   </svg>
 );
 

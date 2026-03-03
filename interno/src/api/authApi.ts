@@ -1,4 +1,4 @@
-import type { LoginCredentials, AuthResponse } from '../types/index';
+import type { LoginCredentials, AuthResponse, RegisterCredentials, User } from '../types/index';
 import apiClient from './config';
 
 export const authApi = {
@@ -6,9 +6,14 @@ export const authApi = {
         const response = await apiClient.post('/api/auth/login', credentials);
         return response.data;
     },
-    async refresh(): Promise<AuthResponse> {
-        const response = await apiClient.post('/api/auth/refresh');
+
+    async register(credentials: RegisterCredentials): Promise<AuthResponse> {
+        const response = await apiClient.post('/api/auth/register', credentials);
         return response.data;
     },
 
+    async getMe(): Promise<User> {
+        const response = await apiClient.get('/api/auth/me');
+        return response.data;
+    },
 };

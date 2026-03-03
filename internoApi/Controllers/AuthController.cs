@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using InternoApi.DTOs;
 using InternoApi.Services;
+using System.Security.Claims;
 
 namespace InternoApi.Controllers;
 
@@ -16,6 +17,23 @@ public class AuthController : ControllerBase
     {
         _authService = authService;
         _logger = logger;
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<ActionResult<UserDto>> GetMe()
+    {
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+
+        try
+        {
+            var user = await _authService.GetUserById(userId);
+            return Ok(user); 
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(new { message = "User not found" });
+        }
     }
 
     [HttpPost("login")]

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import styles from './Login.module.scss'
+import styles from './Auth.module.scss'
 import Button from '../../components/ui/Button';
 
 const Login = () => {
@@ -30,7 +30,7 @@ const Login = () => {
     navigate(from, { replace: true });
   };
 
-  return (<div className={styles.login}>
+  return (<div className={styles.authContainer}>
     <form onSubmit={handleSubmit}>
       <h2>Sign in</h2>
 

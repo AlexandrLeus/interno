@@ -8,7 +8,8 @@ import Post from './pages/public/Post';
 import Project from './pages/public/Project';
 import Login  from './pages/admin/Login';
 import { AuthProvider } from './context/AuthContext';
-import { ProtectedRoute } from './components/ui/ProtectedRoute'; // use later
+import { ProtectedRoute } from './components/ui/ProtectedRoute'; 
+import Register from './pages/admin/Register';
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
             <Route path="blog" element={<Blog />} />
             <Route path="blog/:id" element={<Post />} />
             <Route path="admin/login" element={<Login />} />
+            <Route path="admin/register" element={<ProtectedRoute requiredRole={'Admin'}><Register /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

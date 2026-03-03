@@ -53,6 +53,13 @@ export interface LoginCredentials {
   rememberMe: boolean;
 }
 
+export interface RegisterCredentials {
+  username: string;
+  email: string;
+  password: string;
+  role: number;
+}
+
 export interface User {
   id: number;
   username: string;

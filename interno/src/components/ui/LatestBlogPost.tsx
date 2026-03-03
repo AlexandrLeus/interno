@@ -1,6 +1,7 @@
 import { useBlogPosts } from '../../hooks/useBlogPosts';
 import styles from './UiComponents.module.scss';
 import { useNavigate } from 'react-router-dom';
+import ArrowBlogItem from '../../assets/icons/ArrowBlogItem.svg'
 
 export default function LatestBlogPost() {
   const navigate = useNavigate();
@@ -25,10 +26,7 @@ export default function LatestBlogPost() {
           <p>{latestPost.description}</p>
           <div >
             {new Date(latestPost.createdAt).toLocaleDateString()}
-            <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="26" cy="26" r="26" fill='#F4F0EC' />
-              <path d="M23.771 32.6855L29.7139 25.9998L23.771 19.3141" stroke="#292F36" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
+            <img src={ArrowBlogItem} alt="arrow" />
           </div>
         </div>
       </div>

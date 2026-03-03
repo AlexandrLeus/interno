@@ -14,6 +14,7 @@ public interface IAuthService
 {
     string GenerateJwtToken(User user);
     string GenerateRefreshToken();
+    Task<UserDto> GetUserById(int userId);
     Task<(AuthResponseDto, string RefreshToken)> Authenticate(LoginDto loginDto);
     Task<(AuthResponseDto AuthDto, string RefreshToken)> Register(RegisterDto registerDto);
     Task<(string accessToken, string refreshToken)> RefreshToken(string refreshToken);
@@ -163,6 +164,22 @@ public class AuthService : IAuthService
 
         return (authDto, refreshToken);
 
+    }
+    public async Task<UserDto> GetUserById(int userId)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null)
+            throw new KeyNotFoundException($"User with ID {userId} not found");
+
+        return new UserDto
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            Role = user.Role.ToString()
+        };
     }
 
     public string HashPassword(string password)
