@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { useBlogPost, useSearch } from '../../hooks/useBlogPosts';
 import styles from './Post.module.scss';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm'
 
 const Post = () => {
     const navigate = useNavigate();
@@ -51,14 +53,18 @@ const Post = () => {
         <div className={styles.postContent}>
             <h1 className='title'>{post.title}</h1>
             <img src={post.imageUrl} alt={post.title} />
-            <div>
+            <div className={styles.postDate}>
                 <small>Created {new Date(post.createdAt).toLocaleDateString()}</small>
                 {post.updatedAt && (
                     <small>Updated {new Date(post.updatedAt).toLocaleDateString()}</small>
                 )}
             </div>
             <p>{post.description}</p>
-            <p>{post.content}</p>
+            <div className="markdownBody">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {post.content}
+                </ReactMarkdown>
+            </div>
         </div>
         <div className={styles.sideBar}>
             <div className={styles.search}>

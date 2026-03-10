@@ -1,0 +1,32 @@
+.createPost {
+    width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 100px;
+
+    h1 {
+        font-size: 40px;
+        line-height: 125%;
+        font-weight: 400;
+        font-family: "DM Serif Display", serif;
+        color: #292F36;
+    }
+
+    .formGroup {
+        display: grid;
+        gap: 5px;
+    }
+
+}
+
+.required {
+    color: red;
+}
+
+.errorMassage {
+    color: red;
+}
+
+.active{
+    background-color: #388eeb;
+    color: white;
+}

@@ -55,7 +55,7 @@ public class AuthService : IAuthService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(1),
+            Expires = DateTime.UtcNow.AddDays(1),
             Issuer = jwtSettings["Issuer"] ?? Environment.GetEnvironmentVariable("JWT_ISSUER"),
             Audience = jwtSettings["Audience"] ?? Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
             SigningCredentials = new SigningCredentials(
@@ -94,7 +94,7 @@ public class AuthService : IAuthService
         var authDto = new AuthResponseDto
         {
             Token = accessToken,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            ExpiresAt = DateTime.UtcNow.AddDays(1),
             User = new UserDto
             {
                 Id = user.Id,
@@ -152,7 +152,7 @@ public class AuthService : IAuthService
         var authDto = new AuthResponseDto
         {
             Token = accessToken,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            ExpiresAt = DateTime.UtcNow.AddDays(1),
             User = new UserDto
             {
                 Id = user.Id,

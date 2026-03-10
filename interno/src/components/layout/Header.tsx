@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import styles from './Header.module.scss';
 import logo from '../../assets/icons/Logo.svg';
+import { useAuth } from '../../context/AuthContext';
 
 const Header = () => {
-
+  const { isAuthenticated } = useAuth();
   return (
     <header>
       <div className={styles.container}>
@@ -30,6 +31,10 @@ const Header = () => {
           <Link to="/contact">
             Contact
           </Link>
+          {isAuthenticated && (<>
+            <Link to="/blog/create">Create Post</Link>
+            <Link to="/profile">Profile</Link>
+          </>)}
         </div>
       </div>
     </header>

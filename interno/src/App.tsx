@@ -10,6 +10,7 @@ import Login  from './pages/admin/Login';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ui/ProtectedRoute'; 
 import Register from './pages/admin/Register';
+import { CreatePost } from './pages/public/CreatePost';
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
             <Route path="blog/:id" element={<Post />} />
             <Route path="admin/login" element={<Login />} />
             <Route path="admin/register" element={<ProtectedRoute requiredRole={'Admin'}><Register /></ProtectedRoute>} />
+            <Route path="blog/create" element={<ProtectedRoute><CreatePost /></ProtectedRoute>}/> 
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

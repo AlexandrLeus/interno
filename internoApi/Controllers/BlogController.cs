@@ -4,6 +4,7 @@ using InternoApi.Models;
 using InternoApi.Data;
 using InternoApi.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using InternoApi.Services;
 
 namespace InternoApi.Controllers
 {
@@ -12,10 +13,12 @@ namespace InternoApi.Controllers
     public class BlogController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFileService _fileService;
 
-        public BlogController(ApplicationDbContext context)
+        public BlogController(ApplicationDbContext context, IFileService fileService)
         {
             _context = context;
+            _fileService = fileService;
         }
 
         [HttpGet]
@@ -158,7 +161,7 @@ namespace InternoApi.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<BlogPostDto>> CreateBlogPost(CreateBlogPostDto createDto)
+        public async Task<ActionResult<BlogPostDto>> CreateBlogPost([FromForm] CreateBlogPostDto createDto)
         {
 
             var blogPost = new BlogPost
@@ -166,10 +169,12 @@ namespace InternoApi.Controllers
                 Title = createDto.Title,
                 Description = createDto.Description,
                 Content = createDto.Content,
-                ImageUrl = createDto.ImageUrl,
                 CreatedAt = DateTime.UtcNow,
             };
-
+            if (createDto.Image != null && createDto.Image.Length > 0)
+            {
+                blogPost.ImageUrl = await _fileService.SaveFileAsync(createDto.Image);
+            }
             if (createDto.TagIds?.Any() == true)
             {
                 if (createDto.TagIds.Contains(0))
@@ -217,9 +222,12 @@ namespace InternoApi.Controllers
 
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateBlogPost(int id, UpdateBlogPostDto updateDto)
+        public async Task<IActionResult> UpdateBlogPost(int id, [FromForm] UpdateBlogPostDto updateDto)
         {
-            var blogPost = await _context.BlogPosts.FindAsync(id);
+            var blogPost = await _context.BlogPosts.Include(p => p.Tags)
+            .Include(p => p.Categories)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
 
             if (blogPost == null)
             {
@@ -235,8 +243,41 @@ namespace InternoApi.Controllers
             if (updateDto.Content != null)
                 blogPost.Content = updateDto.Content;
 
-            if (updateDto.ImageUrl != null)
-                blogPost.ImageUrl = updateDto.ImageUrl;
+            if (updateDto.Image != null)
+            {
+                if (!string.IsNullOrEmpty(blogPost.ImageUrl))
+                {
+                    var oldFileName = Path.GetFileName(blogPost.ImageUrl);
+                    await _fileService.DeleteFileAsync(oldFileName);
+                }
+                var imageUrl = await _fileService.SaveFileAsync(updateDto.Image);
+                blogPost.ImageUrl = imageUrl;
+            }
+
+            if (updateDto.TagIds != null)
+            {
+                var newTags = await _context.Tags
+                    .Where(t => updateDto.TagIds.Contains(t.Id))
+                    .ToListAsync();
+                if (newTags.Count != updateDto.TagIds.Count)
+                {
+                    var missingIds = updateDto.TagIds.Except(newTags.Select(t => t.Id));
+                    throw new Exception($"Invalid tags: {string.Join(", ", missingIds)}");
+                }
+                blogPost.Tags = newTags;
+            }
+            if (updateDto.CategoryIds != null)
+            {
+                var newCategories = await _context.Categories
+                    .Where(c => updateDto.CategoryIds.Contains(c.Id))
+                    .ToListAsync();
+                if (newCategories.Count != updateDto.CategoryIds.Count)
+                {
+                    var missingIds = updateDto.CategoryIds.Except(newCategories.Select(t => t.Id));
+                    throw new Exception($"Invalid tags: {string.Join(", ", missingIds)}");
+                }
+                blogPost.Categories = newCategories;
+            }
 
             blogPost.UpdatedAt = DateTime.UtcNow;
 
@@ -263,12 +304,20 @@ namespace InternoApi.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteBlogPost(int id)
         {
-            var blogPost = await _context.BlogPosts.FindAsync(id);
+            var blogPost = await _context.BlogPosts.Include(p => p.Tags)
+            .Include(p => p.Categories)
+            .FirstOrDefaultAsync(p => p.Id == id);
             if (blogPost == null)
             {
                 return NotFound();
             }
-
+            if (!string.IsNullOrEmpty(blogPost.ImageUrl))
+            {
+                var fileName = Path.GetFileName(blogPost.ImageUrl);
+                await _fileService.DeleteFileAsync(fileName);
+            }
+            blogPost.Tags.Clear();
+            blogPost.Categories.Clear();
             _context.BlogPosts.Remove(blogPost);
             await _context.SaveChangesAsync();
 

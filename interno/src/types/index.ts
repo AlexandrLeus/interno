@@ -10,6 +10,15 @@ export interface Category {
   isActive: boolean;
 }
 
+export interface CreatePostCredentials {
+  title: string;
+  description: string;
+  content: string;
+  image: File | null;
+  tagIds: number[];      
+  categoryIds: number[];  
+}
+
 export interface BlogPosts {
   id: number;
   title: string;

@@ -1,4 +1,4 @@
-import type {BlogPost, PaginatedResponse, BlogPosts, SearchBlogPost} from '../types/index';
+import type { BlogPost, PaginatedResponse, BlogPosts, SearchBlogPost, CreatePostCredentials } from '../types/index';
 import apiClient from './config';
 
 export const blogApi = {
@@ -33,8 +33,23 @@ export const blogApi = {
     return response.data;
   },
 
-  async create(post: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt'>): Promise<BlogPost> {
-    const response = await apiClient.post('/api/blog', post);
+  async create(post: CreatePostCredentials): Promise<BlogPost> {
+    const formData = new FormData();
+    formData.append('title', post.title);
+    formData.append('description', post.description);
+    formData.append('content', post.content);
+    post.tagIds.forEach(id => formData.append('tagIds', id.toString()));
+    post.categoryIds.forEach(id => formData.append('categoryIds', id.toString()));
+
+    if (post.image) {
+      formData.append('image', post.image);
+    }
+    const response = await apiClient.post('/api/blog', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
     return response.data;
   },
 
