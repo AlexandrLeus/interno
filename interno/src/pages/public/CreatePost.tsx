@@ -253,7 +253,7 @@ export const CreatePost = () => {
             onChange={handleEditorChange}
           />
         </div>
-        <Button text="Create Post" BackgroundColor="#292F36" arrowColor="#CDA274" />
+        <Button disabled={submitting} text={submitting ? 'Creating post...' : 'Create Post'} BackgroundColor="#292F36" arrowColor="#CDA274" />
       </form>
     </div>
   );

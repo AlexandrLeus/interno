@@ -20,6 +20,8 @@ PostgreSQL (v15 or higher)
 `dotnet restore`
 ### Set up environment variables
 `cp .env.example .env`
+
+Data in appsettings.json takes precedence over .env
 ### Apply database migrations
 `dotnet ef database update`
 ### Run the backend

@@ -111,7 +111,7 @@ const Register = () => {
             <div>
                 <Button text={isLoading ? 'Creating account...' : 'Registration'} BackgroundColor="#292F36" arrowColor="#CDA274" />
             </div>
-            <div className={styles.authLink}>Already have an account? <Link to="/admin/login">Login here</Link></div>
+            <div className={styles.authLink}>Already have an account? <Link to="/login">Login here</Link></div>
         </form>
     </div>);
 };

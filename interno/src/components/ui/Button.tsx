@@ -5,6 +5,7 @@ interface ButtonProps {
   size?: 'sm' | 'md' | 'lg';
   arrowColor: string;
   onClick?: () => void;
+  disabled?:boolean;
 }
 
 const Arrow = ({ color }: { color: string }) => (
@@ -19,11 +20,13 @@ export default function Button({
   TextColor = '#FFFFFF',
   size = 'md',
   arrowColor,
-  onClick
+  onClick,
+  disabled
 }: ButtonProps) {
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
       style={{
         background: BackgroundColor,
         padding: size === 'sm' ? '8px 16px' : size === 'lg' ? '16px 32px' : '26px 50px',

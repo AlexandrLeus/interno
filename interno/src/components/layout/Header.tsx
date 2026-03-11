@@ -31,10 +31,10 @@ const Header = () => {
           <Link to="/contact">
             Contact
           </Link>
-          {isAuthenticated && (<>
+          {isAuthenticated ? (<>
             <Link to="/blog/create">Create Post</Link>
             <Link to="/profile">Profile</Link>
-          </>)}
+          </>):(<Link to="/login">Login</Link>)}
         </div>
       </div>
     </header>

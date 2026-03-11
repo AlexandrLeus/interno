@@ -23,7 +23,7 @@ export default function App() {
             <Route path="project" element={<Project />} />
             <Route path="blog" element={<Blog />} />
             <Route path="blog/:id" element={<Post />} />
-            <Route path="admin/login" element={<Login />} />
+            <Route path="login" element={<Login />} />
             <Route path="admin/register" element={<ProtectedRoute requiredRole={'Admin'}><Register /></ProtectedRoute>} />
             <Route path="blog/create" element={<ProtectedRoute><CreatePost /></ProtectedRoute>}/> 
             <Route path="*" element={<NotFound />} />

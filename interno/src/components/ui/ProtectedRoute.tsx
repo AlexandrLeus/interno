@@ -7,7 +7,7 @@ export const ProtectedRoute = ({ children, requiredRole }: { children: React.Rea
   if (loading) return <div>Loading...</div>;
 
   if (!isAuthenticated) {
-    return <Navigate to="/admin/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
   if (requiredRole) {
     if (!user || user.role !== requiredRole) {

@@ -68,7 +68,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IFileService, LocalFileService>();
+builder.Services.AddScoped<IFileService, CloudinaryService>(); // change to LocalFileService in development
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
