@@ -1,12 +1,12 @@
-import { useQuery, keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { blogApi } from '../api/blogApi';
 import { tagApi } from '../api/tagApi';
-import type { PaginatedResponse, BlogPosts, SearchBlogPost } from '../types/index';
+import type { PaginatedResponse, BlogPosts, SearchBlogPost, BlogPostsParams } from '../types/index';
 
-export const useBlogPosts = (page: number, pageSize: number, tag?: number[], category?: number[]) => {
+export const useBlogPosts = ({ page, pageSize,  tag, category, author }: BlogPostsParams) => {
   return useQuery<PaginatedResponse<BlogPosts>>({
-    queryKey: ['blog-posts', page, pageSize, tag, category],
-    queryFn: () => blogApi.getAll(page, pageSize, tag, category),
+    queryKey: ['blog-posts', page, pageSize, tag, category, author],
+    queryFn: () => blogApi.getAll(page, pageSize, tag, category, author),
     placeholderData: keepPreviousData,
     staleTime: 1000 * 60,
   });
@@ -36,6 +36,26 @@ export const useSearch = (searchTerm: string, pageSize = 5) =>
         ? lastPage.page + 1
         : undefined,
   });
+
+  export const useBlogDelete = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (postId: number) => blogApi.delete(postId),
+    
+    onSuccess: (postId) => {
+      queryClient.invalidateQueries({ queryKey: ['blog-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['my-posts'] });
+      queryClient.removeQueries({ queryKey: ['blogPost', postId] });
+      
+      console.log('Post deleted successfully');
+    },
+    
+    onError: (error: any) => {
+      console.error('Delete failed:', error.response?.data?.message || error.message);
+    },
+  });
+};
 
 export const useTags = () => {
   return useQuery({

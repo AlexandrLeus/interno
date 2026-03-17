@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import styles from './Auth.module.scss'
+import styles from '../public/Auth.module.scss'
 import Button from '../../components/ui/Button';
 
 const Register = () => {
@@ -109,7 +109,7 @@ const Register = () => {
                
             )}
             <div>
-                <Button text={isLoading ? 'Creating account...' : 'Registration'} BackgroundColor="#292F36" arrowColor="#CDA274" />
+                <Button disabled={isLoading} text={isLoading ? 'Creating account...' : 'Registration'} BackgroundColor="#292F36" arrowColor="#CDA274" />
             </div>
             <div className={styles.authLink}>Already have an account? <Link to="/login">Login here</Link></div>
         </form>

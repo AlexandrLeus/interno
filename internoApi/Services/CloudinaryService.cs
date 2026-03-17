@@ -51,9 +51,7 @@ namespace InternoApi.Services
                 var uploadParams = new ImageUploadParams
                 {
                     File = new FileDescription(file.FileName, stream),
-                    Transformation = new Transformation()
-                        .Width(600)           
-                        .Crop("limit")          
+                    Transformation = new Transformation()         
                         .Quality("auto")       
                         .FetchFormat("auto"),
                     

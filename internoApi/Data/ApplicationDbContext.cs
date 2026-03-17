@@ -29,6 +29,15 @@ namespace InternoApi.Data
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id");
 
+                    entity.Property(e => e.UserId)
+                        .IsRequired()
+                        .HasColumnName("user_id");
+
+                    entity.HasOne(e => e.User)
+                        .WithMany(u => u.Posts)
+                        .HasForeignKey(e => e.UserId)
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     entity.Property(e => e.Title)
                         .IsRequired()
                         .HasMaxLength(200)

@@ -18,6 +18,7 @@ public interface IAuthService
     Task<(AuthResponseDto, string RefreshToken)> Authenticate(LoginDto loginDto);
     Task<(AuthResponseDto AuthDto, string RefreshToken)> Register(RegisterDto registerDto);
     Task<(string accessToken, string refreshToken)> RefreshToken(string refreshToken);
+    Task<bool> RevokeRefreshToken(string refreshToken);
     string HashPassword(string password);
     bool VerifyPassword(string password, string passwordHash);
 }
@@ -180,6 +181,21 @@ public class AuthService : IAuthService
             Email = user.Email,
             Role = user.Role.ToString()
         };
+    }
+
+    public async Task<bool> RevokeRefreshToken(string refreshToken)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+
+        if (user == null)
+            return false;
+
+        user.RefreshToken = null;
+        user.RefreshTokenExpiryTime = null;
+        await _context.SaveChangesAsync();
+
+        return true;
     }
 
     public string HashPassword(string password)

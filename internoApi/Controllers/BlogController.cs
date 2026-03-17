@@ -5,6 +5,7 @@ using InternoApi.Data;
 using InternoApi.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using InternoApi.Services;
+using System.Security.Claims;
 
 namespace InternoApi.Controllers
 {
@@ -26,7 +27,8 @@ namespace InternoApi.Controllers
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 6,
             [FromQuery] int? tag = null,
-            [FromQuery] int? category = null)
+            [FromQuery] int? category = null,
+            [FromQuery] int? author = null)
 
         {
 
@@ -45,6 +47,11 @@ namespace InternoApi.Controllers
                 query = query.Where(p => p.Categories.Any(c => c.Id == category.Value));
             }
 
+            if (author.HasValue)
+            {
+                query = query.Where(p => p.UserId == author.Value);
+            }
+
             var totalCount = await query.CountAsync();
             var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
@@ -58,6 +65,7 @@ namespace InternoApi.Controllers
                     Title = p.Title,
                     Description = p.Description,
                     ImageUrl = p.ImageUrl,
+                    AuthorId = p.UserId,
                     CreatedAt = p.CreatedAt,
                     TagIds = p.Tags.Select(t => t.Id).ToList(),
                     CategoryIds = p.Categories.Select(c => c.Id).ToList()
@@ -137,6 +145,7 @@ namespace InternoApi.Controllers
                 ImageUrl = p.ImageUrl,
                 CreatedAt = p.CreatedAt,
                 UpdatedAt = p.UpdatedAt,
+                AuthorId = p.UserId,
                 Tags = p.Tags.Select(t => new TagDto
                 {
                     Id = t.Id,
@@ -163,12 +172,13 @@ namespace InternoApi.Controllers
         [Authorize]
         public async Task<ActionResult<BlogPostDto>> CreateBlogPost([FromForm] CreateBlogPostDto createDto)
         {
-
+            var userIdClaim = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             var blogPost = new BlogPost
             {
                 Title = createDto.Title,
                 Description = createDto.Description,
                 Content = createDto.Content,
+                UserId = userIdClaim,
                 CreatedAt = DateTime.UtcNow,
             };
             if (createDto.Image != null && createDto.Image.Length > 0)
@@ -228,10 +238,17 @@ namespace InternoApi.Controllers
             .Include(p => p.Categories)
             .FirstOrDefaultAsync(p => p.Id == id);
 
-
             if (blogPost == null)
             {
                 return NotFound();
+            }
+
+            var UserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var isAdmin = User.IsInRole("Admin");
+
+            if (blogPost.UserId != UserId && !isAdmin)
+            {
+                return Forbid();
             }
 
             if (updateDto.Title != null)
@@ -310,6 +327,13 @@ namespace InternoApi.Controllers
             if (blogPost == null)
             {
                 return NotFound();
+            }
+            var UserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var isAdmin = User.IsInRole("Admin");
+
+            if (blogPost.UserId != UserId && !isAdmin)
+            {
+                return Forbid();
             }
             if (!string.IsNullOrEmpty(blogPost.ImageUrl))
             {

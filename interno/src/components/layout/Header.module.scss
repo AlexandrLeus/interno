@@ -40,4 +40,36 @@ header {
         font-weight: 400;
         font-family: "Jost", sans-serif;
     }
+    span{
+        color: #292F36;
+        text-decoration: none;
+        font-size: 20px;
+        line-height: 125%;
+        font-weight: 400;
+        font-family: "Jost", sans-serif;
+    }
+}
+
+.profileMenu{
+    position: relative;
+    cursor: pointer;
+}
+.Dropdown{
+    position:absolute;
+    display: grid;
+    width: 100px;
+    padding: 10px 10px;
+    gap: 10px;
+    background-color: white;
+    border-radius: 20px;
+    border: 1px solid #141414;
+    text-align: center;
+    right: 0;
+    overflow: hidden;
+    left: 50%; 
+    transform: translateX(-50%);
+    top: 100%;
+    a:hover{
+        background-color: #d3cdcd;
+    }
 }

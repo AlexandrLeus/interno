@@ -131,4 +131,20 @@ public class AuthController : ControllerBase
         }
     }
 
+    [HttpPost("logout")]
+    [Authorize]
+    public async Task<IActionResult> Logout()
+    {
+        var refreshToken = Request.Cookies["refreshToken"];
+
+        if (!string.IsNullOrEmpty(refreshToken))
+        {
+            await _authService.RevokeRefreshToken(refreshToken);
+        }
+
+        Response.Cookies.Delete("refreshToken");
+
+        return Ok();
+    }
+
 }

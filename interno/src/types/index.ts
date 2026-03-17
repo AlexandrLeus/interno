@@ -81,3 +81,11 @@ export interface AuthResponse {
   expiresAt: string;
   user: User;
 }
+
+export interface BlogPostsParams {
+  page: number;
+  pageSize: number;
+  tag?: number[];
+  category?: number[];
+  author?: number;
+}

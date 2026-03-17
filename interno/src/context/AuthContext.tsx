@@ -14,6 +14,7 @@ interface AuthContextType {
   user: User | null;
   login: (data: LoginCredentials) => Promise<void>;
   register: (data: RegisterCredentials) => Promise<void>;
+  logout: () => Promise<void>;
   loading: boolean;
 }
 
@@ -58,8 +59,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('access_token', response.token);
     setUser(response.user);
   };
+  const logout = async () => {
+  try {
+    setLoading(true);
+    await authApi.logout();
+  } catch (error) {
+    console.error('Logout error:', error);
+  } finally {
+    localStorage.removeItem('access_token');
+    setUser(null);
+    navigate('/');
+    setLoading(false);
+  }
+};
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, register, loading }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

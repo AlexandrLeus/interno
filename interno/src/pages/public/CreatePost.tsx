@@ -10,7 +10,7 @@ import MdEditor from "react-markdown-editor-lite";
 import MarkdownIt from "markdown-it";
 import "react-markdown-editor-lite/lib/index.css";
 
-export const CreatePost = () => {
+const CreatePost = () => {
   const navigate = useNavigate();
   const mdParser = new MarkdownIt();
   const [form, setForm] = useState<CreatePostCredentials>({
@@ -258,3 +258,5 @@ export const CreatePost = () => {
     </div>
   );
 };
+
+export default CreatePost;

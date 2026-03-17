@@ -17,8 +17,8 @@
     &:hover {
         background-color: #F4F0EC;
 
-        circle {
-            fill: white;
+        .arrow {
+            filter:  invert(1);
         }
     }
 
@@ -27,6 +27,7 @@
         height: 290px;
         border-top-left-radius: 45px;
         border-top-right-radius: 45px;
+        object-fit: cover;
     }
 
     >h2 {
@@ -63,6 +64,7 @@
         width: 569px;
         height: 478px;
         border-radius: 50px;
+        object-fit: cover;
     }
 
     >div {
@@ -96,4 +98,26 @@
             margin-bottom: 20px;
         }
     }
+}
+
+.actionButton {
+    width: 80%;
+    border-radius: 20px;
+    border: 1px solid black;
+    background-color: white;
+    height: 20px;
+    display: flex;
+    justify-self: center;
+    margin-top: 10px;
+    height: 30px;
+    font-size: 20px;
+    font-weight: 400;
+    font-family: "DM Serif Display", serif;
+    color: #292F36;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.actionButton:hover {
+    background-color: #F4F0EC;
 }

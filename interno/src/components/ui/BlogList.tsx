@@ -1,19 +1,32 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useBlogPosts } from '../../hooks/useBlogPosts';
 import Pagination from './Pagination';
 import styles from './UiComponents.module.scss';
 import ArrowBlogItem from '../../assets/icons/ArrowBlogItem.svg'
 
-export default function BlogList() {
+interface BlogListProps {
+  posts: any[];
+  totalPages?: number;
+  currentPage: number;
+  onPageChange: (page: number) => void;
+  showActions?: boolean;
+  onEdit?: (id: number) => void;
+  onDelete?: (id: number) => void;
+  deletingId?: number | null;
+  title?: string;
+}
+
+export default function BlogList({
+  posts,
+  totalPages = 1,
+  currentPage,
+  onPageChange,
+  showActions = false,
+  onEdit,
+  onDelete,
+  deletingId,
+  title = ""
+}: BlogListProps) {
   const navigate = useNavigate();
-  const [page, setPage] = useState(1);
-  const pageSize = 6;
-
-  const { data, isLoading, isError } = useBlogPosts(page, pageSize);
-
-  if (isLoading) return <div>Loading...</div>;
-  if (isError || !data) return <div>Error loading posts</div>;
 
   const handlePostClick = (id: number) => {
     navigate(`/blog/${id}`);
@@ -21,26 +34,34 @@ export default function BlogList() {
 
   return (
     <div>
-      <h1 className='title'>Articles And News</h1>
+      <h1 className='title'>{title}</h1>
       <div className={styles.blogContainer}>
-        {data.items.map(post => (
+        {posts.map(post => (<div>
           <div onClick={() => handlePostClick(post.id)} key={post.id} className={styles.blogList}>
             <img src={post.imageUrl} alt={post.title} />
             <h2 >{post.title}</h2>
             <div>
               {new Date(post.createdAt).toLocaleDateString()}
-              <img src={ArrowBlogItem} alt="arrow" />
+              <img src={ArrowBlogItem} alt="arrow" className={styles.arrow} />
             </div>
           </div>
-        ))}
-
+          {showActions && (
+            <div className={styles.postActions}>
+              <button className={styles.actionButton} onClick={() => {onEdit?.(post.id)}}>
+                Edit
+              </button>
+              <button className={styles.actionButton} onClick={() => {onDelete?.(post.id)}} disabled={deletingId === post.id}>
+                {deletingId === post.id ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          )}
+        </div>))}
       </div>
       <Pagination
-        totalPages={data.totalPages}
-        currentPage={page}
-        onPageChange={setPage}
+        totalPages={totalPages}
+        currentPage={currentPage}
+        onPageChange={onPageChange}
       />
     </div>
-
   );
 }

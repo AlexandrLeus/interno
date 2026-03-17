@@ -2,7 +2,7 @@ import type { BlogPost, PaginatedResponse, BlogPosts, SearchBlogPost, CreatePost
 import apiClient from './config';
 
 export const blogApi = {
-  async getAll(page: number, pageSize: number, tag?: number[], category?: number[]): Promise<PaginatedResponse<BlogPosts>> {
+  async getAll(page: number, pageSize: number, tag?: number[], category?: number[], author?: number): Promise<PaginatedResponse<BlogPosts>> {
     const params: Record<string, any> = {
       page,
       pageSize
@@ -13,6 +13,10 @@ export const blogApi = {
     }
     if (category && category.length > 0) {
       params.tag = category.join(',');
+    }
+
+    if (author) {
+      params.author = author;
     }
 
     const response = await apiClient.get('/api/blog', { params });
