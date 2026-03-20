@@ -4,11 +4,20 @@ import { blogApi } from '../../api/blogApi';
 import { tagApi } from '../../api/tagApi';
 import { categoryApi } from '../../api/categoryApi';
 import type { CreatePostCredentials, Tag, Category } from '../../types';
-import styles from './CreatePost.module.scss'
-import Button from '../../components/ui/Button';
 import MdEditor from "react-markdown-editor-lite";
 import MarkdownIt from "markdown-it";
 import "react-markdown-editor-lite/lib/index.css";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import {
+  Box,
+  Button,
+  Chip,
+  Container,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 
 const CreatePost = () => {
   const navigate = useNavigate();
@@ -24,7 +33,7 @@ const CreatePost = () => {
 
   const [tags, setTags] = useState<Tag[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-
+  const [imageUploaded, setImageUploaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -88,6 +97,7 @@ const CreatePost = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setForm(prev => ({ ...prev, image: file }));
+    setImageUploaded(true);
     clearError('image');
   };
   const validateForm = (): boolean => {
@@ -130,22 +140,19 @@ const CreatePost = () => {
 
     if (!validateForm()) {
       setTimeout(() => {
-      const firstError = document.querySelector(`.${styles.errorMassage}`);
-      firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    },100);
+        const firstError = document.querySelector('[data-error="true"]');
+        firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
       return;
     }
 
     setSubmitting(true);
     try {
       await blogApi.create(form);
-      navigate('/blog', {
-        state: { message: 'Post created successfully!' }
-      });
+      navigate('/blog');
     } catch (error: any) {
-      console.error('Error creating post:', error);
       setErrors({
-        submit: error.response?.data?.message || 'Failed to create post'
+        submit: 'Failed to create post'
       });
     } finally {
       setSubmitting(false);
@@ -157,105 +164,180 @@ const CreatePost = () => {
   }
 
   return (
-    <div className={styles.createPost}>
-      <h1>Create New Post</h1>
-      {errors.submit && (
-        <div>{errors.submit}</div>
-      )}
-      <form onSubmit={handleSubmit}>
-        <div className={styles.formGroup}>
-          <label htmlFor="title">
-            Title <span className={styles.required}>*</span> {errors.title && <span className={styles.errorMassage}>{errors.title}</span>}
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            placeholder="Enter post title"
-            disabled={submitting}
-          />
-        </div>
-        <div className={styles.formGroup}>
-          <label htmlFor="description">
-            Description <span className={styles.required}>*</span> {errors.description && <span className={styles.errorMassage}>{errors.description}</span>}
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            placeholder="Brief description of your post"
-            rows={3}
-            disabled={submitting}
-          />
-        </div>
-        <div className={styles.formGroup}>
-          <label htmlFor="image">
-            Featured Image <span className={styles.required}>*</span> {errors.image && <span className={styles.errorMassage}>{errors.image}</span>}
-          </label>
-          <div>
-            <input
-              type="file"
-              id="image"
-              accept="image/*"
+    <Container maxWidth="md">
+      <Paper sx={{ p: 4, borderRadius: 3 }}>
+        <Typography variant="h4" gutterBottom>
+          Create New Post
+        </Typography>
+
+        {errors.submit && (
+          <Typography color="error" mb={2} data-error="true">
+            {errors.submit}
+          </Typography>
+        )}
+
+        <Box component="form" onSubmit={handleSubmit}>
+          <Stack spacing={3}>
+
+            <TextField
+              label="Title"
+              name="title"
+              value={form.title}
+              onChange={handleChange}
+              fullWidth
+              required
+              error={!!errors.title}
+              helperText={errors.title}
               disabled={submitting}
-              onChange={handleImageChange}
             />
-            <p>Accepted formats: JPG, PNG (max 5MB)</p>
-          </div>
-        </div>
-        <div className={styles.formGroup}>
-          <label>
-            Tags <span className={styles.required}>*</span> {errors.tagIds && <span className={styles.errorMassage}>{errors.tagIds}</span>}
-          </label>
-          <div>
-            {tags.map((tag) => (
-              <button
-                key={tag.id}
-                type="button"
-                className={form.tagIds.includes(tag.id) ? styles.active : ""}
-                onClick={() => handleTagToggle(tag.id)}
-                disabled={submitting}
-              >
-                {tag.name}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className={styles.formGroup}>
-          <label>
-            Categories <span className={styles.required}>*</span> {errors.categoryIds && <span className={styles.errorMassage}>{errors.categoryIds}</span>}
-          </label>
-          <div>
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                type="button"
-                className={form.categoryIds.includes(category.id) ? styles.active : ""}
-                onClick={() => handleCategoryToggle(category.id)}
-                disabled={submitting}
-              >
-                {category.name}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className={styles.formGroup}>
-          <label>
-            Content <span className={styles.required}>*</span> {errors.content && <span className={styles.errorMassage}>{errors.content}</span>}
-          </label>
-          <MdEditor
-            style={{ height: "400px" }}
-            value={form.content}
-            renderHTML={(text) => mdParser.render(text)}
-            onChange={handleEditorChange}
-          />
-        </div>
-        <Button disabled={submitting} text={submitting ? 'Creating post...' : 'Create Post'} BackgroundColor="#292F36" arrowColor="#CDA274" />
-      </form>
-    </div>
+
+            <TextField
+              label="Description"
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              fullWidth
+              multiline
+              rows={3}
+              required
+              error={!!errors.description}
+              helperText={errors.description}
+              disabled={submitting}
+            />
+
+            <Box>
+              <Box display="flex">
+                <Typography variant="subtitle1" gutterBottom>
+                  Featured Image *
+                </Typography>
+                {errors.image && (
+                  <Typography color="error" data-error="true" sx={{ ml: 1 }}>
+                    {errors.image}
+                  </Typography>
+                )}
+              </Box>
+              <Box display="flex" alignItems="center" gap={1}>
+                <Button
+                  variant="outlined"
+                  component="label"
+                  disabled={submitting}
+                >
+                  Upload Image
+                  <input
+                    type="file"
+                    hidden
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                </Button>
+                {imageUploaded && (
+                  <CheckCircleIcon sx={{ color: 'green', fontSize: 28 }} />
+                )}
+              </Box>
+              <Typography variant="caption" display="block">
+                JPG, PNG (max 5MB)
+              </Typography>
+            </Box>
+
+            <Box>
+              <Box display="flex">
+                <Typography gutterBottom>
+                  Tags *
+                </Typography>
+                {errors.tagIds && (
+                  <Typography color="error" data-error="true" sx={{ ml: 1 }}>
+                    {errors.tagIds}
+                  </Typography>
+                )}
+              </Box>
+              <Stack direction="row" flexWrap="wrap" gap={1}>
+                {tags.map((tag) => (
+                  <Chip
+                    key={tag.id}
+                    label={tag.name}
+                    clickable
+                    color={
+                      form.tagIds.includes(tag.id)
+                        ? "primary"
+                        : "default"
+                    }
+                    onClick={() => handleTagToggle(tag.id)}
+                    disabled={submitting}
+                  />
+                ))}
+              </Stack>
+            </Box>
+
+            <Box>
+              <Box display="flex">
+                <Typography gutterBottom>
+                  Categories *
+                </Typography>
+                {errors.categoryIds && (
+                  <Typography color="error" data-error="true" sx={{ ml: 1 }}>
+                    {errors.categoryIds}
+                  </Typography>
+                )}
+              </Box>
+              <Stack direction="row" flexWrap="wrap" gap={1}>
+                {categories.map((category) => (
+                  <Chip
+                    key={category.id}
+                    label={category.name}
+                    clickable
+                    color={
+                      form.categoryIds.includes(category.id)
+                        ? "secondary"
+                        : "default"
+                    }
+                    onClick={() =>
+                      handleCategoryToggle(category.id)
+                    }
+                    disabled={submitting}
+                  />
+                ))}
+              </Stack>
+            </Box>
+
+            <Box>
+              <Box display="flex">
+                <Typography gutterBottom>
+                  Content *
+                </Typography>
+                {errors.content && (
+                  <Typography color="error" data-error="true" sx={{ ml: 1 }}>
+                    {errors.content}
+                  </Typography>
+                )}
+              </Box>
+              <MdEditor
+                style={{ height: "400px" }}
+                value={form.content}
+                renderHTML={(text) => mdParser.render(text)}
+                onChange={handleEditorChange}
+              />
+
+            </Box>
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              disabled={submitting}
+              sx={{
+                backgroundColor: "#292F36",
+                color: "#CDA274",
+                "&:hover": {
+                  backgroundColor: "#1f242a",
+                },
+                py: 1.5,
+              }}
+            >
+              {submitting ? "Creating post..." : "Create Post"}
+            </Button>
+          </Stack>
+        </Box>
+      </Paper>
+    </Container>
   );
 };
 
