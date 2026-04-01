@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import styles from './Header.module.scss';
 import logo from '../../assets/icons/Logo.svg';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../auth/useAuth';
 
 const Header = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, authenticated, logout, login, register } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -52,7 +52,7 @@ const Header = () => {
           {/* <Link to="/contact">
             Contact
           </Link> */}
-          {isAuthenticated ? (<>
+          {authenticated ? (
             <div className={styles.profileMenu} ref={dropdownRef}>
               <span
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -65,7 +65,8 @@ const Header = () => {
                 <Link to="/profile">Profile</Link>
                 <a onClick={handleLogout}>Logout</a></div>)}
             </div>
-          </>) : (<Link to="/login">Login</Link>)}
+          ) : (<><a onClick={login}>Login</a>
+          <a onClick={register}>Registration</a></>)}
         </div>
       </div>
     </header>

@@ -3,16 +3,17 @@ import { useBlogPosts, useBlogDelete } from '../../hooks/useBlogPosts';
 import { useNavigate } from 'react-router-dom';
 import BlogList from '../../components/ui/BlogList';
 import styles from './MyPosts.module.scss';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../auth/useAuth';
 
 const MyPosts = () => {
     const navigate = useNavigate();
     const [page, setPage] = useState(1);
     const pageSize = 6;
-    const auth = useAuth();
+    const { user, hasRole } = useAuth();
+    const isAdmin = hasRole("admin");
     const params = {
          page: page, pageSize: pageSize,
-        ...(auth.user?.role === 'Admin' ? {} : { author: auth.user?.id })
+        ...(isAdmin ? {} : { author: user?.id })
     };
     const { data, isLoading, isError } = useBlogPosts(params);
     const deleteMutation = useBlogDelete();

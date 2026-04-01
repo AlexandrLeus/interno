@@ -1,9 +1,9 @@
 import type { Category } from '../types/index';
-import apiClient  from './config';
+import {publicClient}  from './config';
 
 export const categoryApi = {
     async getCategories(): Promise<Category[]> {
-        const response = await apiClient.get('/api/category')
+        const response = await publicClient.get('/api/category')
         return response.data;
     }
 }

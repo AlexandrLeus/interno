@@ -1,23 +1,10 @@
-import type { LoginCredentials, AuthResponse, RegisterCredentials, User } from '../types/index';
-import apiClient from './config';
+import type { User } from '../types/index';
+import {privateClient} from './config';
 
 export const authApi = {
-    async login(credentials: LoginCredentials): Promise<AuthResponse> {
-        const response = await apiClient.post('/api/auth/login', credentials);
-        return response.data;
-    },
-
-    async register(credentials: RegisterCredentials): Promise<AuthResponse> {
-        const response = await apiClient.post('/api/auth/register', credentials);
-        return response.data;
-    },
 
     async getMe(): Promise<User> {
-        const response = await apiClient.get('/api/auth/me');
+        const response = await privateClient.get('/api/auth/me');
         return response.data;
-    },
-
-    async logout(): Promise<void> {
-        await apiClient.post('/api/auth/logout');
     },
 };

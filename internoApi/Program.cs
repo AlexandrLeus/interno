@@ -6,10 +6,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using InternoApi.Services;
 using Microsoft.OpenApi;
+using Sprache;
 
 if (File.Exists(".env"))
 {
-    Env.Load(); 
+    Env.Load();
 }
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,16 +26,11 @@ if (string.IsNullOrEmpty(connectionString))
     var database = Environment.GetEnvironmentVariable("DB_NAME");
     var username = Environment.GetEnvironmentVariable("DB_USER");
     var password = Environment.GetEnvironmentVariable("DB_PASSWORD");
-    
+
     connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
 }
 
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["JWT_SECRET"]
-    ?? Environment.GetEnvironmentVariable("JWT_SECRET")
-    ?? throw new InvalidOperationException("JWT Secret not configured");
-
-var key = Encoding.UTF8.GetBytes(secretKey);
+var keycloakSettings = builder.Configuration.GetSection("Keycloak");
 
 builder.Services.AddAuthentication(options =>
 {
@@ -43,31 +39,32 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = true;
-    options.SaveToken = true;
+    options.Authority = keycloakSettings["Authority"] ?? Environment.GetEnvironmentVariable("AUTHORITY");
+    options.RequireHttpsMetadata = false;   
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
         ValidateIssuer = true,
-        ValidIssuer = jwtSettings["Issuer"] ?? Environment.GetEnvironmentVariable("JWT_ISSUER"),
-        ValidateAudience = true,
-        ValidAudience = jwtSettings["Audience"] ?? Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+        ValidIssuer = keycloakSettings["Authority"] ?? Environment.GetEnvironmentVariable("AUTHORITY"),
+        ValidateAudience =  true,
+        ValidAudience = "account",
+        RoleClaimType = "realm_access.roles",
         ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
+        ValidateIssuerSigningKey = true
     };
 });
 
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy =>
-        policy.RequireRole("Admin"));
+        policy.RequireRole("admin"));
 
     options.AddPolicy("Authenticated", policy =>
         policy.RequireAuthenticatedUser());
 });
 
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IFileService, CloudinaryService>(); // change to LocalFileService in development
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -92,7 +89,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 var allowedOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
-var corsOrigins = allowedOrigins?.Split(',', StringSplitOptions.RemoveEmptyEntries) 
+var corsOrigins = allowedOrigins?.Split(',', StringSplitOptions.RemoveEmptyEntries)
     ?? Array.Empty<string>();
 builder.Services.AddCors(options =>
 {
@@ -120,19 +117,6 @@ if (forceHttps || !app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
-        await SeedData.InitializeAsync(services);
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding the database.");
-    }
-}
 app.UseStaticFiles();
 app.UseCors("ReactApp");
 app.UseAuthorization();

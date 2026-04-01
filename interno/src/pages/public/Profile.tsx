@@ -14,7 +14,7 @@ import {
   FormControlLabel,
   Divider,
 } from "@mui/material";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../auth/useAuth";
 
 const UserProfile = () => {
   const [tab, setTab] = useState(0);

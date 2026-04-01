@@ -20,7 +20,7 @@ namespace InternoApi.Models
         
         public ICollection<Category> Categories { get; set; } = new List<Category>();
 
-        public int UserId { get; set; } 
+        public string UserId { get; set; } = null!;
 
         public User? User { get; set; }
     }

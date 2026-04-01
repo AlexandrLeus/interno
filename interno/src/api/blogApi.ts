@@ -1,8 +1,8 @@
 import type { BlogPost, PaginatedResponse, BlogPosts, SearchBlogPost, CreatePostCredentials } from '../types/index';
-import apiClient from './config';
+import {publicClient, privateClient} from './config';
 
 export const blogApi = {
-  async getAll(page: number, pageSize: number, tag?: number[], category?: number[], author?: number): Promise<PaginatedResponse<BlogPosts>> {
+  async getAll(page: number, pageSize: number, tag?: number[], category?: number[], author?: string): Promise<PaginatedResponse<BlogPosts>> {
     const params: Record<string, any> = {
       page,
       pageSize
@@ -19,12 +19,12 @@ export const blogApi = {
       params.author = author;
     }
 
-    const response = await apiClient.get('/api/blog', { params });
+    const response = await publicClient.get('/api/blog', { params });
     return response.data;
   },
 
   async search(page: number, pageSize: number, q: string): Promise<PaginatedResponse<SearchBlogPost>> {
-    const response = await apiClient.get('/api/blog/search', {
+    const response = await publicClient.get('/api/blog/search', {
       params: {
         page, pageSize, q
       }
@@ -33,7 +33,7 @@ export const blogApi = {
   },
 
   async getById(id: number): Promise<BlogPost> {
-    const response = await apiClient.get(`/api/blog/${id}`);
+    const response = await publicClient.get(`/api/blog/${id}`);
     return response.data;
   },
 
@@ -48,7 +48,7 @@ export const blogApi = {
     if (post.image) {
       formData.append('image', post.image);
     }
-    const response = await apiClient.post('/api/blog', formData, {
+    const response = await privateClient.post('/api/blog', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -58,11 +58,11 @@ export const blogApi = {
   },
 
   async update(id: number, post: Partial<BlogPost>): Promise<void> {
-    await apiClient.put(`/api/blog/${id}`, post);
+    await privateClient.put(`/api/blog/${id}`, post);
   },
 
   async delete(id: number): Promise<void> {
-    await apiClient.delete(`/api/blog/${id}`);
+    await privateClient.delete(`/api/blog/${id}`);
   },
 
 };

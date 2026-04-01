@@ -9,7 +9,7 @@ namespace InternoApi.DTOs
         public string Description { get; set; } = string.Empty;
         public string ImageUrl { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
-        public int AuthorId { get; set; }
+        public string AuthorId { get; set; } = null!;
         public List<int> TagIds { get; set; } = new List<int>();
         public List<int> CategoryIds { get; set; } = new List<int>();
     }
@@ -28,7 +28,7 @@ namespace InternoApi.DTOs
         public string ImageUrl { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public string Content { get; set; } = string.Empty;
-        public int AuthorId { get; set; }
+        public string AuthorId { get; set; } = null!;
         public DateTime? UpdatedAt { get; set; }
         public List<TagDto> Tags { get; set; } = new List<TagDto>();
         public List<CategoryDto> Categories { get; set; } = new List<CategoryDto>();

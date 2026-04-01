@@ -56,30 +56,10 @@ export interface SearchBlogPost {
   description: string;
 }
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
-  rememberMe: boolean;
-}
-
-export interface RegisterCredentials {
-  username: string;
-  email: string;
-  password: string;
-  role: number;
-}
-
 export interface User {
-  id: number;
+  id: string;
   username: string;
   email: string;
-  role: string;
-}
-
-export interface AuthResponse {
-  token: string;
-  expiresAt: string;
-  user: User;
 }
 
 export interface BlogPostsParams {
@@ -87,5 +67,5 @@ export interface BlogPostsParams {
   pageSize: number;
   tag?: number[];
   category?: number[];
-  author?: number;
+  author?: string;
 }

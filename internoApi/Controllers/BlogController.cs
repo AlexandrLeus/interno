@@ -28,7 +28,7 @@ namespace InternoApi.Controllers
             [FromQuery] int pageSize = 6,
             [FromQuery] int? tag = null,
             [FromQuery] int? category = null,
-            [FromQuery] int? author = null)
+            [FromQuery] string? author = null)
 
         {
 
@@ -47,9 +47,9 @@ namespace InternoApi.Controllers
                 query = query.Where(p => p.Categories.Any(c => c.Id == category.Value));
             }
 
-            if (author.HasValue)
+            if (!string.IsNullOrEmpty(author))
             {
-                query = query.Where(p => p.UserId == author.Value);
+                query = query.Where(p => p.UserId == author);
             }
 
             var totalCount = await query.CountAsync();
@@ -172,13 +172,13 @@ namespace InternoApi.Controllers
         [Authorize]
         public async Task<ActionResult<BlogPostDto>> CreateBlogPost([FromForm] CreateBlogPostDto createDto)
         {
-            var userIdClaim = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             var blogPost = new BlogPost
             {
                 Title = createDto.Title,
                 Description = createDto.Description,
                 Content = createDto.Content,
-                UserId = userIdClaim,
+                UserId = userId,
                 CreatedAt = DateTime.UtcNow,
             };
             if (createDto.Image != null && createDto.Image.Length > 0)
@@ -243,7 +243,7 @@ namespace InternoApi.Controllers
                 return NotFound();
             }
 
-            var UserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var UserId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             var isAdmin = User.IsInRole("Admin");
 
             if (blogPost.UserId != UserId && !isAdmin)
@@ -328,7 +328,7 @@ namespace InternoApi.Controllers
             {
                 return NotFound();
             }
-            var UserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var UserId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             var isAdmin = User.IsInRole("Admin");
 
             if (blogPost.UserId != UserId && !isAdmin)

@@ -36,6 +36,7 @@ namespace InternoApi.Data
                     entity.HasOne(e => e.User)
                         .WithMany(u => u.Posts)
                         .HasForeignKey(e => e.UserId)
+                        .HasPrincipalKey(u => u.KeycloakId)
                         .OnDelete(DeleteBehavior.Restrict);
 
                     entity.Property(e => e.Title)
@@ -174,33 +175,18 @@ namespace InternoApi.Data
                     .IsRequired()
                     .HasMaxLength(50)
                     .HasColumnName("email");
-
-                entity.Property(e => e.PasswordHash)
+                
+                entity.HasIndex(e => e.KeycloakId)
+                    .IsUnique();
+        
+                entity.Property(e => e.KeycloakId)
                     .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnName("keycloak_id");
+
+                entity.Property(e => e.AvatarUrl)
                     .HasMaxLength(255)
-                    .HasColumnName("password_hash");
-
-                entity.Property(e => e.Role)
-                    .HasConversion<int>()
-                    .HasDefaultValue(UserRole.User)
-                    .HasColumnName("role");
-
-                entity.Property(e => e.IsActive)
-                    .HasDefaultValue(true)
-                    .HasColumnName("is_active");
-
-                entity.Property(e => e.RefreshToken)
-                    .HasColumnName("refresh_token");
-
-                entity.Property(e => e.RefreshTokenExpiryTime)
-                    .HasColumnName("refresh_token_expiry_time");
-
-                entity.Property(e => e.CreatedAt)
-                    .HasColumnName("created_at")
-                    .HasDefaultValueSql("NOW()");
-
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnName("updated_at")
+                    .HasColumnName("avatar_url")
                     .IsRequired(false);
 
             });
