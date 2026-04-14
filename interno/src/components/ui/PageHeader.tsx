@@ -18,7 +18,7 @@ export default function PageHeader({
         backgroundPosition: 'center'
     }}>
         <div style={{
-            backgroundColor: '#FFF',
+            backgroundColor: 'var(--bg-default)',
             width: '503px',
             height: '178px',
             borderTopLeftRadius: '37px',

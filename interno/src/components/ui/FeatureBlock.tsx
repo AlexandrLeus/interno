@@ -37,11 +37,11 @@ export default function FeatureBlock({
         <h1 className='title'>{title}</h1>
         <p style={{
           fontFamily: '"Jost", sans-serif',
-          color: '#4D5053',
+          color: 'var(--text-secondary)',
           fontSize: '22px',
           fontWeight: 400
         }}> {text}</p>
-        <Button text={buttonText} BackgroundColor="#292F36" arrowColor="#CDA274"/>
+        <Button text={buttonText} arrowColor="#CDA274"/>
       </div>
 
     </div>

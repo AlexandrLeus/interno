@@ -54,19 +54,19 @@ const Header = () => {
           </Link> */}
           {authenticated ? (
             <div className={styles.profileMenu} ref={dropdownRef}>
-              <span
+              <a href='#'
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               >
                 {user?.username}
-              </span>
+              </a>
               {isDropdownOpen && (<div className={styles.Dropdown}>
                 <Link to="/blog/create">Create Post</Link>
                 <Link to="/my-posts">My Posts</Link>
                 <Link to="/profile">Profile</Link>
-                <a onClick={handleLogout}>Logout</a></div>)}
+                <a href='#' onClick={handleLogout}>Logout</a></div>)}
             </div>
-          ) : (<><a onClick={login}>Login</a>
-          <a onClick={register}>Registration</a></>)}
+          ) : (<><a href='#' onClick={login}>Login</a>
+          <a href='#' onClick={register}>Registration</a></>)}
         </div>
       </div>
     </header>

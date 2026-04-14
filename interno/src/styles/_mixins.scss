@@ -1,0 +1,21 @@
+@mixin heading-font($color: null) {
+    font-family: "DM Serif Display", serif;
+    font-weight: 400;
+    @if $color == null {
+        color: var(--text-primary);
+    }
+    @else {
+        color: $color;
+    }
+}
+
+@mixin body-font($color: null) {
+    font-weight: 400;
+    font-family: "Jost", sans-serif;
+    @if $color == null {
+        color: var(--text-secondary);
+    }
+    @else {
+        color: $color;
+    }
+}

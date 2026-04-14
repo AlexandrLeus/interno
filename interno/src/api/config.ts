@@ -19,9 +19,8 @@ export const privateClient = axios.create({
   },
 });
 
-privateClient.interceptors.request.use((config) => {
-  if (keycloak?.token) {
-    config.headers.Authorization = `Bearer ${keycloak.token}`;
-  }
+privateClient.interceptors.request.use(async(config) => {
+  await keycloak.updateToken(30);
+  config.headers.Authorization = `Bearer ${keycloak.token}`;
   return config;
 });

@@ -8,5 +8,19 @@ export default defineConfig({
     port: 3000,
     host: true,
     strictPort: true,
-  }
+  },
+ resolve: {
+    alias: {
+      "@": "/src",
+    },
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `
+          @use "@/styles/mixins" as *;
+        `,
+      },
+    },
+  },
 })

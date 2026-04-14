@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useState, type ReactNode } from "react";
 import keycloak from "./keycloak";
 import type { User } from "../types";
-import { authApi } from "../api/authApi";
+import { useMe } from "../hooks/useUsers";
 
 interface AuthContextType {
   authenticated: boolean;
@@ -10,6 +10,7 @@ interface AuthContextType {
   login: () => void;
   logout: () => void;
   register: () => void;
+  updateProfile: () => void;
   hasRole: (role: string) => boolean;
   initialized: boolean;
 }
@@ -19,7 +20,6 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [authenticated, setAuthenticated] = useState(false);
   const [initialized, setInitialized] = useState(false);
-  const [user, setUser] = useState<User | undefined>(undefined);
 
   useEffect(() => {
     keycloak
@@ -31,25 +31,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       .then((auth) => {
         setAuthenticated(auth);
         setInitialized(true);
-        if (auth) {
-          fetchMe();
-        }
       })
       .catch((err) => {
         console.error("Authentication Failed", err);
         setInitialized(true);
       });
   }, []);
+  
+  const { data: user } = useMe({
+    enabled: authenticated,
+  });
 
-  const fetchMe = async () => {
-    try {
-      const userData = await authApi.getMe();
-      setUser(userData);
-    } catch (err) {
-      console.error("Failed to fetch /me", err);
-      setUser(undefined);
-    }
-  };
+  const updateProfile = () => keycloak.accountManagement();
   const login = () => keycloak.login();
   const logout = () => keycloak.logout();
   const register = () => keycloak.register()
@@ -65,6 +58,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         login,
         logout,
         register,
+        updateProfile,
         hasRole,
         initialized
       }}

@@ -1,12 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using InternoApi.Data;
 using DotNetEnv;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using InternoApi.Services;
 using Microsoft.OpenApi;
-using Sprache;
 
 if (File.Exists(".env"))
 {

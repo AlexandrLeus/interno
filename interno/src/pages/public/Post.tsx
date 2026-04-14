@@ -108,13 +108,13 @@ const Post = () => {
                 )}
             </div>
 
-            <div className={styles.categories}>
+            <div className={styles.filters}>
                 <h2>Categories</h2>
                 {post.categories.map(c => (
                     <p key={c.id}>{c.name}</p>
                 ))}
             </div>
-            <div className={styles.tags}>
+            <div className={styles.filters}>
                 <h2>Tags</h2>
                 {post.tags.map(t => (
                     <p key={t.id}>{t.name}</p>

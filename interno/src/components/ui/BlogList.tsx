@@ -36,7 +36,7 @@ export default function BlogList({
     <div>
       <h1 className='title'>{title}</h1>
       <div className={styles.blogContainer}>
-        {posts.map(post => (<div>
+        {posts.map(post => (<div key={post.id}>
           <div onClick={() => handlePostClick(post.id)} key={post.id} className={styles.blogList}>
             <img src={post.imageUrl} alt={post.title} />
             <h2 >{post.title}</h2>

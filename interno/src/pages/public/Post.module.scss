@@ -1,6 +1,4 @@
 .post {
-    width: 1200px;
-    margin: 0 auto;
     display: flex;
     justify-content: space-between;
 }
@@ -12,7 +10,7 @@
         width: 800px;
         height: 540px;
         border-radius: 50px;
-        object-fit: cover; 
+        object-fit: cover;
     }
 
     .postDate {
@@ -21,19 +19,15 @@
 
         small {
             font-size: 16px;
-            font-weight: 400;
             line-height: 150%;
-            font-family: "Jost", sans-serif;
-            color: #4D5053;
+            @include body-font;
         }
     }
 
     p {
         font-size: 22px;
-        font-weight: 400;
         line-height: 150%;
-        font-family: "Jost", sans-serif;
-        color: #4D5053;
+        @include body-font;
     }
 }
 
@@ -41,13 +35,11 @@
     width: 345px;
     display: flex;
     flex-direction: column;
-    gap: 50px;
+    gap: 50px;  
 
     .search {
         position: relative;
-        width: 278px;
-        height: 33px;
-        background-color: #F4F0EC;
+        background-color: var(--bg-surface);
         border-radius: 20px;
         display: flex;
         justify-content: space-between;
@@ -55,66 +47,52 @@
 
         input {
             border: none;
-            background-color: #F4F0EC;
+            background-color: var(--bg-surface);
             outline: none !important;
             width: 230px;
-             font-size: 22px;
-            font-weight: 400;
+            font-size: 22px;
             line-height: 150%;
-            font-family: "Jost", sans-serif;
-            color: #4D5053;
+            @include body-font;
         }
-        input::placeholder{
-                color: #CDA274;
-            }
+
+        input::placeholder {
+            color: #CDA274;
+        }
     }
 
-    .categories {
-        background-color: #F4F0EC;
-        width: 278px;
+    .filters {
+        background-color: var(--bg-surface);
         padding: 33px;
         border-radius: 20px;
+        @include heading-font;
 
         p {
             font-size: 22px;
-            font-weight: 400;
             line-height: 150%;
-            font-family: "Jost", sans-serif;
-            color: #4D5053;
+            @include body-font;
         }
 
-    }
-
-    .tags{
-
-         p {
-            font-size: 18px;
-            font-weight: 400;
-            line-height: 125%;
-            font-family: "Jost", sans-serif;
-            color: #4D5053;
-        }
     }
 }
 
 .dropdown {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 100%;
-  width: 100%;
-  max-height: 300px;
-  overflow-y: auto;
-  border: 1px solid #ddd;
-  background: white;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--text-primary);
+    background: var(--bg-paper);
 }
 
 .item {
-  padding: 8px 12px;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
 }
 
 .item:hover {
-  background: #f5f5f5;
+    background: var(--bg-hover);
 }

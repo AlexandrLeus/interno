@@ -1,8 +1,3 @@
-.project {
-    width: 1200px;
-    margin: 0 auto;
-}
-
 .tagsContainer {
     display: flex;
     justify-content: space-around;
@@ -17,11 +12,10 @@
     .button {
         padding: 26px 33px;
         border-radius: 18px;
-        background-color: #FFF;
+        background-color: var(--bg-default);
         border: none;
-        font-weight: 600;
         font-size: 18px;
-        font-family: "Jost", sans-serif;
+        @include heading-font
     }
 
     .active {

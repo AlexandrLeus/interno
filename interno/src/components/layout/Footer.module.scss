@@ -1,18 +1,16 @@
 .container {
     display: flex;
     justify-content: space-between;
-    width: 1200px;
+    max-width: 1200px;
     margin:0 auto;
     padding-top: 100px;
+    height: 450px;
 }
 
 .interno {
     font-size: 40px;
     line-height: 125%;
-    font-weight: 400;
-    font-family: "DM Serif Display", serif;
-    color: #292F36;
-
+    @include heading-font;
 }
 
 .commonInfo {
@@ -28,15 +26,16 @@
         margin-bottom: 30px;
         font-size: 22px;
         line-height: 150%;
-        font-weight: 400;
-        font-family: "Jost", sans-serif;
-        color: #4D5053;
+        @include body-font;
     }
 
     .media {
         display: flex;
         gap: 55px;
-        cursor: pointer;
+        img{
+            cursor: pointer;
+        }
+        
     }
 }
 
@@ -47,57 +46,55 @@
     gap: 20px;
 
     h1 {
-        font-size: 25px;
+        font-size: 30px;
+        @include heading-font;
     }
 
     div {
         text-decoration: none;
         font-size: 22px;
-        font-family: "Jost", sans-serif;
-        color: #4D5053;
+        @include body-font;
     }
 }
 
 .pages {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
 
     h1 {
-        font-size: 25px;
+        font-size: 30px;
+        @include heading-font;
     }
 
     a {
         text-decoration: none;
-        line-height: 300%;
         font-size: 22px;
-        font-family: "Jost", sans-serif;
-        color: #4D5053;
+        @include body-font;
     }
 }
 
 .services {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
 
     h1 {
-        font-size: 25px;
+        font-size: 30px;
+        @include heading-font;
     }
 
     a {
         text-decoration: none;
-        line-height: 300%;
         font-size: 22px;
-        font-family: "Jost", sans-serif;
-        color: #4D5053;
+        @include body-font;
     }
 }
 
 .creators {
-    margin-top: 60px;
-    margin-bottom: 30px;
-
+    padding-top: 60px;
+    padding-bottom: 30px;
     text-align: center;
     font-size: 22px;
-    font-family: "Jost", sans-serif;
-    color: #4D5053;
+    @include body-font;
 }

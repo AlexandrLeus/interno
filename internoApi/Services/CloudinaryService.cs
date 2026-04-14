@@ -18,8 +18,8 @@ namespace InternoApi.Services
                 var apiKey = configuration["Cloudinary:ApiKey"] ?? Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY");
                 var apiSecret = configuration["Cloudinary:ApiSecret"] ?? Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET");
 
-                if (string.IsNullOrEmpty(cloudName) || 
-                    string.IsNullOrEmpty(apiKey) || 
+                if (string.IsNullOrEmpty(cloudName) ||
+                    string.IsNullOrEmpty(apiKey) ||
                     string.IsNullOrEmpty(apiSecret))
                 {
                     throw new InvalidOperationException("Cloudinary credentials not configured");
@@ -38,58 +38,85 @@ namespace InternoApi.Services
             }
         }
 
-        public async Task<string> SaveFileAsync(IFormFile file)
+        private async Task<ImageUploadResult> UploadAsync(ImageUploadParams uploadParams)
         {
-            try
+            var result = await _cloudinary.UploadAsync(uploadParams);
+
+            if (result.Error != null)
             {
-                ValidateFile(file);
-
-                _logger.LogInformation("Uploading {FileName} ({FileSize} bytes)", file.FileName, file.Length);
-
-                using var stream = file.OpenReadStream();
-
-                var uploadParams = new ImageUploadParams
-                {
-                    File = new FileDescription(file.FileName, stream),
-                    Transformation = new Transformation()         
-                        .Quality("auto")       
-                        .FetchFormat("auto"),
-                    
-                    PublicId = $"{Guid.NewGuid()}_{Path.GetFileNameWithoutExtension(file.FileName)}",
-                    Folder = "blog_posts",
-                    Overwrite = false,
-                    Tags = "blog,interno"
-                };
-
-                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-
-                if (uploadResult.Error != null)
-                {
-                    _logger.LogError("Cloudinary error: {Error}", uploadResult.Error.Message);
-                    throw new Exception($"Upload failed: {uploadResult.Error.Message}");
-                }
-
-                _logger.LogInformation("File uploaded successfully. PublicId: {PublicId}", uploadResult.PublicId);
-                
-                return uploadResult.SecureUrl.ToString();
+                _logger.LogError("Cloudinary error: {Error}", result.Error.Message);
+                throw new Exception($"Upload failed: {result.Error.Message}");
             }
-            catch (Exception ex)
+
+            return result;
+        }
+        public async Task<(string ImageUrl, string PublicId)> UploadBlogImageAsync(IFormFile file)
+        {
+
+            ValidateFile(file);
+
+            _logger.LogInformation("Uploading {FileName} ({FileSize} bytes)", file.FileName, file.Length);
+
+            using var stream = file.OpenReadStream();
+
+            var uploadParams = new ImageUploadParams
             {
-                _logger.LogError(ex, "Error uploading to Cloudinary");
-                throw;
-            }
+                File = new FileDescription(file.FileName, stream),
+                Transformation = new Transformation()
+                    .Quality("auto")
+                    .FetchFormat("auto"),
+
+                PublicId = $"{Guid.NewGuid()}_{Path.GetFileNameWithoutExtension(file.FileName)}",
+                Folder = "blog_posts",
+                Overwrite = false,
+                Tags = "blog,interno"
+            };
+
+            var result = await UploadAsync(uploadParams);
+
+            _logger.LogInformation("File uploaded successfully. PublicId: {PublicId}", result.PublicId);
+
+            return (result.SecureUrl.ToString(), result.PublicId);
         }
 
-        public async Task<bool> DeleteFileAsync(string fileName)
+        public async Task<(string ImageUrl, string PublicId)> UploadAvatarAsync(IFormFile file)
+        {
+            ValidateFile(file);
+
+            using var stream = file.OpenReadStream();
+
+            var uploadParams = new ImageUploadParams
+            {
+                File = new FileDescription(file.FileName, stream),
+
+                PublicId = $"{Guid.NewGuid()}_{Path.GetFileNameWithoutExtension(file.FileName)}",
+                Folder = "avatars",
+
+                Overwrite = true,
+
+                Transformation = new Transformation()
+                    .Width(300)
+                    .Height(300)
+                    .Crop("fill")
+                    .Gravity("face")
+                    .Quality("auto")
+                    .FetchFormat("auto"),
+
+                Tags = "avatar,user"
+            };
+
+            var result = await UploadAsync(uploadParams);
+
+            return (result.SecureUrl.ToString(), result.PublicId);
+        }
+
+        public async Task<bool> DeleteFileAsync(string publicId)
         {
             try
-            {
-                var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
-                var publicId = $"blog_posts/{fileNameWithoutExt}";
-                
+            {   
                 if (string.IsNullOrEmpty(publicId))
                 {
-                    _logger.LogWarning("Could not extract publicId from URL: {Url}", fileName);
+                    _logger.LogWarning("publicId is empty");
                     return false;
                 }
 
@@ -122,7 +149,7 @@ namespace InternoApi.Services
             if (file.Length > 5 * 1024 * 1024)
                 throw new ArgumentException("File size cannot exceed 5MB");
 
-            var allowedTypes = new[] { 
+            var allowedTypes = new[] {
                 "image/jpeg", "image/png", "image/webp",
                 "image/jpg", "image/bmp", "image/tiff"
             };

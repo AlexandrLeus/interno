@@ -1,6 +1,5 @@
 import { useQuery, keepPreviousData, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { blogApi } from '../api/blogApi';
-import { tagApi } from '../api/tagApi';
 import type { PaginatedResponse, BlogPosts, SearchBlogPost, BlogPostsParams } from '../types/index';
 
 export const useBlogPosts = ({ page, pageSize,  tag, category, author }: BlogPostsParams) => {
@@ -47,8 +46,6 @@ export const useSearch = (searchTerm: string, pageSize = 5) =>
       queryClient.invalidateQueries({ queryKey: ['blog-posts'] });
       queryClient.invalidateQueries({ queryKey: ['my-posts'] });
       queryClient.removeQueries({ queryKey: ['blogPost', postId] });
-      
-      console.log('Post deleted successfully');
     },
     
     onError: (error: any) => {
@@ -57,11 +54,3 @@ export const useSearch = (searchTerm: string, pageSize = 5) =>
   });
 };
 
-export const useTags = () => {
-  return useQuery({
-    queryKey: ['tags'],
-    queryFn: () => tagApi.getTags(),
-    placeholderData: keepPreviousData,
-    staleTime: 1000 * 60,
-  });
-};

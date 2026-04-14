@@ -1,4 +1,3 @@
-import styles from './Blog.module.scss'
 import PageHeader from '../../components/ui/PageHeader';
 import BlogImg from '../../assets/images/Blog.png'
 import BlogList from '../../components/ui/BlogList';
@@ -16,10 +15,10 @@ const Blog = () => {
 
     return (<div>
         <PageHeader text='Articles & News' imageUrl={BlogImg} />
-        <div className={styles.latestPost}>
+        <div>
             <LatestBlogPost />
         </div>
-        <div className={styles.articlesAndNews}>
+        <div>
             <BlogList
                 title='Articles And News'
                 posts={data.items}

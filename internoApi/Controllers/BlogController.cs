@@ -183,7 +183,7 @@ namespace InternoApi.Controllers
             };
             if (createDto.Image != null && createDto.Image.Length > 0)
             {
-                blogPost.ImageUrl = await _fileService.SaveFileAsync(createDto.Image);
+                (blogPost.ImageUrl, blogPost.ImagePublicId) = await _fileService.UploadBlogImageAsync(createDto.Image);
             }
             if (createDto.TagIds?.Any() == true)
             {
@@ -267,8 +267,7 @@ namespace InternoApi.Controllers
                     var oldFileName = Path.GetFileName(blogPost.ImageUrl);
                     await _fileService.DeleteFileAsync(oldFileName);
                 }
-                var imageUrl = await _fileService.SaveFileAsync(updateDto.Image);
-                blogPost.ImageUrl = imageUrl;
+                (blogPost.ImageUrl, blogPost.ImagePublicId) = await _fileService.UploadBlogImageAsync(updateDto.Image);
             }
 
             if (updateDto.TagIds != null)

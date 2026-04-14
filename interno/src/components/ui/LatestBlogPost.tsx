@@ -5,7 +5,7 @@ import ArrowBlogItem from '../../assets/icons/ArrowBlogItem.svg'
 
 export default function LatestBlogPost() {
   const navigate = useNavigate();
-  const { data, isPending } = useBlogPosts(1, 6);
+  const { data, isPending } = useBlogPosts({page:1,pageSize:6});
 
   if (isPending || !data) return null;
 
@@ -26,7 +26,7 @@ export default function LatestBlogPost() {
           <p>{latestPost.description}</p>
           <div >
             {new Date(latestPost.createdAt).toLocaleDateString()}
-            <img src={ArrowBlogItem} alt="arrow" />
+            <img src={ArrowBlogItem} alt="arrow" className={styles.arrow} />
           </div>
         </div>
       </div>

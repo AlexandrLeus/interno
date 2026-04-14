@@ -1,26 +1,21 @@
 .getStarted {
-    max-width: 1200px;
     height: 750px;
     background-image: url('../../assets/images/GetStarted.png');
     border-radius: 70px;
-    margin: 0 auto;
     background-position: center;
     div {
         padding: 208px 715px 301px 52px;
 
         h2{
             font-size: 65px;
-            font-weight: 400;
             line-height: 125%;
-            font-family: "DM Serif Display", serif;
+            @include heading-font(#292F36);
         }
 
         p {
             font-size: 22px;
-            font-weight: 400;
             line-height: 150%;
-            font-family: "Jost", sans-serif;
-            color: #4D5053;
+            @include body-font(#4D5053);
         }
     }
 }

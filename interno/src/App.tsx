@@ -12,11 +12,13 @@ import { ProtectedRoute } from './components/ui/ProtectedRoute';
 import MyPosts from './pages/public/MyPosts';
 import CreatePost from './pages/public/CreatePost';
 import { ScrollToTop } from './components/ui/ScrollToTop';
+import { ThemeProviderWrapper } from './contexts/ThemeContext';
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <ThemeProviderWrapper>
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Layout />}>
@@ -31,6 +33,7 @@ export default function App() {
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
+        </ThemeProviderWrapper>
       </AuthProvider>
     </BrowserRouter>
   );

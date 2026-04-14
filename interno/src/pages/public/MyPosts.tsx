@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useBlogPosts, useBlogDelete } from '../../hooks/useBlogPosts';
 import { useNavigate } from 'react-router-dom';
 import BlogList from '../../components/ui/BlogList';
-import styles from './MyPosts.module.scss';
 import { useAuth } from '../../auth/useAuth';
 
 const MyPosts = () => {
@@ -34,7 +33,7 @@ const MyPosts = () => {
         navigate(`/blog/edit/${postId}`)
     }
     return (
-        <div className={styles.myPosts}>
+        <div>
             <BlogList
                 title='My Posts'
                 posts={data.items}

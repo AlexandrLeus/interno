@@ -1,6 +1,6 @@
 interface ButtonProps {
   text: string;
-  BackgroundColor: string;
+  BackgroundColor?: string;
   TextColor?: string;
   size?: 'sm' | 'md' | 'lg';
   arrowColor: string;

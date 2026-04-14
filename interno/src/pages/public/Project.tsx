@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useTags, useBlogPosts } from '../../hooks/useBlogPosts';
+import { useBlogPosts } from '../../hooks/useBlogPosts';
+import {useTags} from '../../hooks/useTags'
 import PageHeader from '../../components/ui/PageHeader';
 import ProjectImg from '../../assets/images/Projects.png';
 import styles from './Project.module.scss';
@@ -34,7 +35,7 @@ const Project = () => {
     if (isError || !posts) return <div>Error loading posts</div>;
     if (isLoadingTags) return <div>Loading tags...</div>;
 
-    return (<div className={styles.project}>
+    return (<div>
         <PageHeader text='Our Project' imageUrl={ProjectImg} />
         <div className={styles.tagsContainer}>
             <div className={styles.tags}>

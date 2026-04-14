@@ -58,6 +58,10 @@ namespace InternoApi.Data
                         .IsRequired()
                         .HasColumnName("image_url");
 
+                    entity.Property(e => e.ImagePublicId)
+                        .HasColumnName("image_public_id")
+                        .IsRequired();
+
                     entity.Property(e => e.CreatedAt)
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("NOW()");
@@ -187,6 +191,10 @@ namespace InternoApi.Data
                 entity.Property(e => e.AvatarUrl)
                     .HasMaxLength(255)
                     .HasColumnName("avatar_url")
+                    .IsRequired(false);
+                
+                entity.Property(e => e.AvatarPublicId)
+                    .HasColumnName("avatar_public_id")
                     .IsRequired(false);
 
             });
